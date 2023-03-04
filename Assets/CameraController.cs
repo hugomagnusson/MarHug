@@ -20,7 +20,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        transform.position = drone.position-(Vector3.ProjectOnPlane(drone.forward,Vector3.up)*3)+Vector3.up;
+        transform.position = drone.position-(Vector3.ProjectOnPlane(drone.forward,Vector3.up).normalized*6)+Vector3.up*2;
         
 
         
