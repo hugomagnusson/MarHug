@@ -8,6 +8,7 @@ public class DroneController : MonoBehaviour
     public float angleTorque = 0;
    private Rigidbody rb;
    private float upThrust;
+    private float engineThrust;
     public float sideThrust;
     public Transform missileAnchor;
 
@@ -25,12 +26,12 @@ public class DroneController : MonoBehaviour
    private Vector3 rotation;
    public Object ball;
     private GameObject tempBall;
-    private float speed = 0;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
-        //thrust = 0;
+        engineThrust = 0f;
         aList = new List<Animator>();
         aList.Add(a1);
         aList.Add(a2);
@@ -46,7 +47,6 @@ public class DroneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        speed = 1.5f;
          upThrust = 0f;
          rotation = new Vector3(0,0,0);
          if (Input.GetKey ("w"))
@@ -59,39 +59,50 @@ public class DroneController : MonoBehaviour
          rotation.y = -0.7f;
         if (Input.GetKey("a"))
         {
-            rotation.z = 1;
+            rotation.z = 1.2f;
             //rotation.y -= 0.2f;
         }
          if (Input.GetKey ("d"))
         {
-            rotation.z = -1;
+            rotation.z = -1.2f;
             //rotation.y += 0.2f;
         }
         if (Input.GetKey("left shift"))
         {
-            upThrust = 0f + thrust;
-            speed = 4;
+            upThrust = 1f;
         }
         if (Input.GetKey("left ctrl"))
         {
-            speed = 1;
-            upThrust = 1f - thrust;
+            upThrust = -1f;
         }
          if (Input.GetKeyDown ("space"))
          tempBall = (GameObject) Instantiate(ball,missileAnchor.position,transform.rotation);
         if (tempBall != null){
-            tempBall.GetComponent<Rigidbody>().velocity = rb.velocity + (transform.forward * 5);
+            tempBall.GetComponent<Rigidbody>().velocity = rb.velocity + (transform.forward * 20);
         }
         tempBall = null;
         foreach (Animator a in aList)
         {
-            a.SetFloat("flapSpeed", speed);
+            a.SetFloat("flapSpeed", engineThrust * (1.2f + (upThrust))*3);
         }
     }
     void FixedUpdate(){
+        print(engineThrust);
+        if (upThrust == 1 && engineThrust <= 1)
+        {
+            engineThrust += 0.0001f+(engineThrust/100);
+        }
+        if (engineThrust > 1)
+            engineThrust = 1;
+        if (upThrust == -1 && Physics.Raycast(transform.position, -transform.up, 2) && engineThrust >= 0)
+        {
+            engineThrust -= 0.005f;
+        }
+        if (engineThrust < 0)
+            engineThrust = 0;
         
       rb.AddRelativeTorque(rotation*rotFactor);
-      rb.AddRelativeForce(new Vector3 (rotation.z * sideThrust*(-1f), upThrust*Physics.gravity.magnitude,rotation.x*sideThrust));
+      rb.AddRelativeForce(new Vector3 (rotation.z * sideThrust*(-1f)*engineThrust, engineThrust*(2+(thrust*upThrust))*Physics.gravity.magnitude/2,rotation.x*sideThrust * engineThrust));
 
       var rotStable = Quaternion.FromToRotation(transform.up, Vector3.up);
       rb.AddTorque(new Vector3(rotStable.x, rotStable.y, rotStable.z)*uprightTorque);
