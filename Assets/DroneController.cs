@@ -12,7 +12,7 @@ public class DroneController : MonoBehaviour
     private float engineThrust;
     public float sideThrust;
     public Transform missileAnchor;
-
+    public ScoreKeeper sk;
     public Animator a1;
     public Animator a2;
     public Animator a3;
@@ -55,9 +55,9 @@ public class DroneController : MonoBehaviour
          if (Input.GetKey ("s"))
          rotation.x = -1;
          if (Input.GetKey ("e"))
-         rotation.y = 1f;
+         rotation.y = 2f;
          if (Input.GetKey ("q"))
-         rotation.y = -1f;
+         rotation.y = -2f;
         if (Input.GetKey("a"))
         {
             rotation.z = 1.2f;
@@ -93,6 +93,9 @@ public class DroneController : MonoBehaviour
 	
     }
     void FixedUpdate(){
+        if(!Physics.Raycast(transform.position, -transform.up, 2)){
+            sk.startTime();
+        }
         if (upThrust == 1 && engineThrust <= 1)
         {
             engineThrust += (0.0001f+(engineThrust/100))*0.02f/Time.fixedDeltaTime;

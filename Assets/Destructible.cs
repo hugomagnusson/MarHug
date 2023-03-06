@@ -18,7 +18,7 @@ public class Destructible : MonoBehaviour
         
     }
 
-    void OnDestroy()
+    public void OnHit()
     {
         Instantiate(Pieces, transform.position, transform.rotation);
     }
