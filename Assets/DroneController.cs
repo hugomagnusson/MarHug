@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
  using UnityEngine.SceneManagement;
+using TMPro;
 public class DroneController : MonoBehaviour
 {
    public float uprightTorque = 0;
@@ -27,6 +28,9 @@ public class DroneController : MonoBehaviour
     private Vector3 rotation;
     public GameObject ball;
     private GameObject tempBall;
+    private int tutNr;
+    public TextMeshProUGUI tutText;
+    private bool hasFired;
 
     // Start is called before the first frame update
     void Start()
@@ -42,12 +46,40 @@ public class DroneController : MonoBehaviour
         aList.Add(a6);
         aList.Add(a7);
         aList.Add(a8);
-
+        tutNr = 1;
+        hasFired = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+
+        switch (tutNr)
+        {
+            case 1:
+                tutText.text = "Hold left shift to rev up the engine and lift of";
+                if (!Physics.Raycast(transform.position, -transform.up, 2))
+                    tutNr++;
+                break;
+            case 2:
+                tutText.text = "QEWASD for moving around, left shift and ctrl to go up and down";
+                if (rb.velocity.magnitude > 20f)
+                    tutNr++;
+                break;
+            case 3:
+                tutText.text = "Use space to fire rockets";
+                if (hasFired)
+                    tutNr++;
+                break;
+            case 4:
+                tutText.text = "Increase your score by hitting the buildings (or ignore the score and have a nice fly-around)";
+                if (sk.GetScore() > 9)
+                    tutNr++;
+                break;
+            default:
+                tutText.text = "Pressing R resets the entire level";
+                break;
+        }
          upThrust = 0f;
          rotation = new Vector3(0,0,0);
          if (Input.GetKey ("w"))
@@ -76,8 +108,11 @@ public class DroneController : MonoBehaviour
         {
             upThrust = -1f;
         }
-         if (Input.GetKeyDown ("space"))
-         tempBall = (GameObject) Instantiate(ball,missileAnchor.position,missileAnchor.rotation);
+        if (Input.GetKeyDown("space"))
+        {
+            hasFired = true;
+            tempBall = (GameObject)Instantiate(ball, missileAnchor.position, missileAnchor.rotation);
+        }
         if (tempBall != null){
             tempBall.GetComponent<Rigidbody>().velocity = rb.velocity -(transform.up*1);
         }

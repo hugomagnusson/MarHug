@@ -40,4 +40,8 @@ public class ScoreKeeper : MonoBehaviour
     public void startTime(){
         timeStarted = true;
     }
+    public int GetScore()
+    {
+        return score;
+    }
 }
