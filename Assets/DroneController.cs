@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
+ using UnityEngine.SceneManagement;
 public class DroneController : MonoBehaviour
 {
    public float uprightTorque = 0;
@@ -22,16 +23,16 @@ public class DroneController : MonoBehaviour
     public Animator a8;
     List<Animator> aList;
     public float thrust = 0.5f; 
-   public float rotFactor;
-   private Vector3 rotation;
-   public Object ball;
+    public float rotFactor;
+    private Vector3 rotation;
+    public GameObject ball;
     private GameObject tempBall;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
-        engineThrust = 0f;
+        engineThrust = 1f;
         aList = new List<Animator>();
         aList.Add(a1);
         aList.Add(a2);
@@ -54,9 +55,9 @@ public class DroneController : MonoBehaviour
          if (Input.GetKey ("s"))
          rotation.x = -1;
          if (Input.GetKey ("e"))
-         rotation.y = 0.7f;
+         rotation.y = 1f;
          if (Input.GetKey ("q"))
-         rotation.y = -0.7f;
+         rotation.y = -1f;
         if (Input.GetKey("a"))
         {
             rotation.z = 1.2f;
@@ -76,27 +77,31 @@ public class DroneController : MonoBehaviour
             upThrust = -1f;
         }
          if (Input.GetKeyDown ("space"))
-         tempBall = (GameObject) Instantiate(ball,missileAnchor.position,transform.rotation);
+         tempBall = (GameObject) Instantiate(ball,missileAnchor.position,missileAnchor.rotation);
         if (tempBall != null){
-            tempBall.GetComponent<Rigidbody>().velocity = rb.velocity + (transform.forward * 20);
+            tempBall.GetComponent<Rigidbody>().velocity = rb.velocity -(transform.up*1);
         }
         tempBall = null;
         foreach (Animator a in aList)
         {
             a.SetFloat("flapSpeed", engineThrust * (1.2f + (upThrust))*3);
         }
+        if (Input.GetKeyDown ("r")){
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+
+	
     }
     void FixedUpdate(){
-        print(engineThrust);
         if (upThrust == 1 && engineThrust <= 1)
         {
-            engineThrust += 0.0001f+(engineThrust/100);
+            engineThrust += (0.0001f+(engineThrust/100))*0.02f/Time.fixedDeltaTime;
         }
         if (engineThrust > 1)
             engineThrust = 1;
         if (upThrust == -1 && Physics.Raycast(transform.position, -transform.up, 2) && engineThrust >= 0)
         {
-            engineThrust -= 0.005f;
+            engineThrust -= 0.005f*0.02f/Time.fixedDeltaTime;
         }
         if (engineThrust < 0)
             engineThrust = 0;
@@ -106,7 +111,12 @@ public class DroneController : MonoBehaviour
 
       var rotStable = Quaternion.FromToRotation(transform.up, Vector3.up);
       rb.AddTorque(new Vector3(rotStable.x, rotStable.y, rotStable.z)*uprightTorque);
+      float dot = Vector3.Dot(transform.forward,rb.velocity)/(0.0001f + rb.velocity.magnitude);
+      if (dot<0){
+        dot = 0;
+      }
       var rotVel = Quaternion.FromToRotation(transform.forward, rb.velocity);
-      rb.AddTorque(new Vector3(0, rotVel.y, 0) * angleTorque*rb.velocity.magnitude);
+      rb.AddTorque(new Vector3(0, rotVel.y, 0) * angleTorque*rb.velocity.magnitude*dot);
+      
     }
 }
