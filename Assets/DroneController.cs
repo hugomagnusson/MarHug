@@ -32,7 +32,7 @@ public class DroneController : MonoBehaviour
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
-        engineThrust = 1f;
+        engineThrust = 0f;
         aList = new List<Animator>();
         aList.Add(a1);
         aList.Add(a2);
@@ -98,13 +98,13 @@ public class DroneController : MonoBehaviour
         }
         if (upThrust == 1 && engineThrust <= 1)
         {
-            engineThrust += (0.0001f+(engineThrust/100))*0.02f/Time.fixedDeltaTime;
+            engineThrust += ((0.00001f+(engineThrust/1000))*0.02f)/Time.fixedDeltaTime;
         }
         if (engineThrust > 1)
             engineThrust = 1;
         if (upThrust == -1 && Physics.Raycast(transform.position, -transform.up, 2) && engineThrust >= 0)
         {
-            engineThrust -= 0.005f*0.02f/Time.fixedDeltaTime;
+            engineThrust -= 0.0005f*0.02f/Time.fixedDeltaTime;
         }
         if (engineThrust < 0)
             engineThrust = 0;
