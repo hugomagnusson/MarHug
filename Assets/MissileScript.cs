@@ -11,6 +11,7 @@ public class MissileScript : MonoBehaviour
     public float thrust;
     public float timeToDestroy;
     public GameObject explosion;
+    public GameObject ExplosionSound;
     private ScoreKeeper sk;
     void Start()
     {
@@ -43,6 +44,7 @@ public class MissileScript : MonoBehaviour
             }
         }
         Instantiate(explosion, transform.position, transform.rotation);
+        Instantiate(ExplosionSound, transform.position, transform.rotation);
         Destroy(gameObject);
     }
 
