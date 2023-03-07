@@ -57,7 +57,7 @@ public class DroneController : MonoBehaviour
         switch (tutNr)
         {
             case 1:
-                tutText.text = "Hold left shift to rev up the engine and lift of";
+                tutText.text = "Hold left shift to rev up the engine and lift off";
                 if (!Physics.Raycast(transform.position, -transform.up, 2))
                     tutNr++;
                 break;
