@@ -4391,6 +4391,7 @@ MonoBehaviour:
   thrust: 4
   rotFactor: 2
   ball: {fileID: 5705661680684929281, guid: 2821715fd694af8438c148d3b73fc1ef, type: 3}
+  tutText: {fileID: 0}
 --- !u!23 &1808716790
 MeshRenderer:
   m_ObjectHideFlags: 0
